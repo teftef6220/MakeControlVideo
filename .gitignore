@@ -3,8 +3,14 @@ venv/
 .env
 
 Result_data/
+temp/
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
 *.db
+*.mp3
+*.mp4
+*.avi
+*.mkv
+*.gif
