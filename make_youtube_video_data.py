@@ -87,6 +87,8 @@ def download_and_clip_videos(args, json_path, output_dir, base_duration, delta):
             torchscript_device=torch.device("cuda" if torch.cuda.is_available() else "cpu")
         )
 
+    if args.use_wd14_tagger:
+        pass
     #### ================== 
     ##   2. Download and clip videos part
     #### ================== 
@@ -158,7 +160,7 @@ def download_and_clip_videos(args, json_path, output_dir, base_duration, delta):
                 result_video_path_list.append(output_file_path)
 
                 entry = {
-                    "file_path": os.path.join(os.environ['BATH_PATH'], output_file_path),
+                    "file_path": os.path.join(os.environ['BASE_PATH'], output_file_path),
                     "type": "video",
                     "filename": filename,
                     "text": "",
@@ -177,7 +179,7 @@ def download_and_clip_videos(args, json_path, output_dir, base_duration, delta):
             if args.do_dwpose:
                 control_paths = apply_dwpose(args, pose_model, result_video_path_list, control_dir)
                 for entry, control_path in zip(new_entries, control_paths):
-                    entry["control_file_path"] = os.path.join(os.environ['BATH_PATH'], control_path)
+                    entry["control_file_path"] = os.path.join(os.environ['BASE_PATH'], control_path)
 
             # ✅ 成功したら保存
             metadata_entries.extend(new_entries)
@@ -208,7 +210,7 @@ def download_and_clip_videos(args, json_path, output_dir, base_duration, delta):
 
 if __name__ == "__main__":
     load_dotenv()
-    print(os.environ['BATH_PATH'])
+    print(os.environ['BASE_PATH'])
     
     parser = argparse.ArgumentParser(description="YouTube動画をダウンロードしてn±δ秒で切り出すツール")
     parser.add_argument('--use_youtube_data', type=bool, default=True, help="YouTube動画をダウンロードして切り出すか、既存の動画を切り出すか")
@@ -230,5 +232,8 @@ if __name__ == "__main__":
     ## DWpose
     parser.add_argument('--do_dwpose', type=bool, default=True,help="Do dwpose estimation")
 
+    ## WD14 Tagger
+    parser.add_argument('--use_wd14_tagger', type=bool, default=False, help="Use wd14 tagger")
+    
     args = parser.parse_args()
     download_and_clip_videos(args, args.json, args.outdir, args.n, args.delta)

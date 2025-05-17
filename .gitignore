@@ -14,3 +14,6 @@ __pycache__/
 *.avi
 *.mkv
 *.gif
+json_files/
+*.json
+wd14_tagger/wd14_models
