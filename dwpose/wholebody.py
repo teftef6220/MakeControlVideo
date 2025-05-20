@@ -87,7 +87,7 @@ class Wholebody:
             else:
                 #FP16 and INT8 YOLO NAS accept uint8 input
                 det_result = inference_onnx_yolo_nas(self.det, oriImg, detect_classes=[0], dtype=np.uint8)
-        print(f"DWPose: Bbox {((default_timer() - det_start) * 1000):.2f}ms")
+        # print(f"DWPose: Bbox {((default_timer() - det_start) * 1000):.2f}ms")
         if (det_result is None) or (det_result.shape[0] == 0):
             return None
 
@@ -97,7 +97,7 @@ class Wholebody:
         else:
             _, pose_onnx_dtype = guess_onnx_input_shape_dtype(self.pose_filename)
             keypoints, scores = inference_onnx_pose(self.pose, det_result, oriImg, self.pose_input_size, dtype=pose_onnx_dtype)
-        print(f"DWPose: Pose {((default_timer() - pose_start) * 1000):.2f}ms on {det_result.shape[0]} people\n")
+        # print(f"DWPose: Pose {((default_timer() - pose_start) * 1000):.2f}ms on {det_result.shape[0]} people\n")
 
         keypoints_info = np.concatenate(
             (keypoints, scores[..., None]), axis=-1)

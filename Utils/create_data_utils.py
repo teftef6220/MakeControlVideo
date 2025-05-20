@@ -29,6 +29,8 @@ def apply_dwpose(args,pose_model,video_path_list, control_dir):
     """
 
     result_control_paths = []
+    result_total_frames = []
+    result_people_count = []
 
     print (f"================= Start Gen DWpose =====================")
     
@@ -49,13 +51,18 @@ def apply_dwpose(args,pose_model,video_path_list, control_dir):
         frame_paths = []
         frame_idx = 0
 
+        people_count = 0
+        total_frames = 0
+
         while True:
             ret, frame = cap.read()
             if not ret:
                 break
 
+            total_frames += 1
+
             rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            pose_image = pose_model(rgb_frame,include_body=True, include_hand=True, include_face=True)
+            pose_image, keypoint_dict = pose_model(rgb_frame,include_body=True, include_hand=True, include_face=True, image_and_json=True)
             pose_image = np.array(pose_image)
 
             if (pose_image.shape[1], pose_image.shape[0]) != frame_size:
@@ -65,6 +72,9 @@ def apply_dwpose(args,pose_model,video_path_list, control_dir):
             cv2.imwrite(frame_out_path, cv2.cvtColor(pose_image, cv2.COLOR_RGB2BGR))
             frame_paths.append(frame_out_path)
             frame_idx += 1
+
+            if len(keypoint_dict.get("people", [])) > 0:
+                people_count += 1
 
         cap.release()
 
@@ -89,7 +99,10 @@ def apply_dwpose(args,pose_model,video_path_list, control_dir):
         # 動画のパスを保存
         result_control_paths.append(output_video_path)
 
-    return result_control_paths
+        result_people_count.append(people_count)
+        result_total_frames.append(total_frames)
+
+    return result_control_paths , result_people_count, result_total_frames
 
 
 
@@ -152,7 +165,7 @@ def generate_caption(args,model, processor,result_video_path_list, llm_base_dir)
                 generated_ids_trimmed, skip_special_tokens=True, clean_up_tokenization_spaces=False
             )
 
-            if args.default_caption:
+            if args.default_caption != "":
                 result_text = args.default_caption + output_text[0]
             else:
                 result_text = output_text[0]

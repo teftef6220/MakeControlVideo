@@ -16,4 +16,4 @@ __pycache__/
 *.gif
 json_files/
 *.json
-wd14_tagger/wd14_models
+wd14_tagger/wd14_models/
